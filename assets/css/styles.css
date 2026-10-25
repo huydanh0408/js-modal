@@ -102,13 +102,17 @@ p {
   overflow: auto;
 }
 
+.no-scroll {
+  overflow: hidden;
+}
+
 /* Modal content */
 .sub-title {
   color: #666;
 }
 
 /* Modal form */
-form {
+#form {
   display: flex;
   flex-direction: column;
 }
