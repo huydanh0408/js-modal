@@ -3,6 +3,10 @@ const $$ = document.querySelectorAll.bind(document);
 
 function Modal() {
   function getScrollbarWidth() {
+    if (getScrollbarWidth.value) {
+      return getScrollbarWidth.value;
+    }
+
     const div = document.createElement("div");
 
     Object.assign(div.style, {
@@ -14,6 +18,8 @@ function Modal() {
     document.body.appendChild(div);
     const scrollbarWidth = div.offsetWidth - div.clientWidth;
     document.body.removeChild(div);
+
+    getScrollbarWidth.value = scrollbarWidth;
 
     return scrollbarWidth;
   }
