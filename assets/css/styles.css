@@ -101,3 +101,31 @@ p {
   max-height: 80vh;
   overflow: auto;
 }
+
+/* Modal content */
+.sub-title {
+  color: #666;
+}
+
+/* Modal form */
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  margin-top: 20px;
+}
+
+input {
+  margin-top: 10px;
+  max-width: 200px;
+}
+
+.form-login {
+  max-width: 200px;
+  margin-top: 20px;
+  padding: 10px 20px;
+  background: #ccc;
+  border-radius: 5px;
+}

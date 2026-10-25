@@ -29,7 +29,16 @@ const $$ = document.querySelectorAll.bind(document);
  */
 
 function Modal() {
-  this.openModal = (content) => {
+  this.openModal = (options = {}) => {
+    const { templateId } = options;
+    const template = $(`#${templateId}`);
+    if (!template) {
+      console.error(`#${templateId} does not exist!`);
+      return;
+    }
+
+    const content = template.content.cloneNode(true);
+
     const backdrop = document.createElement("div");
     backdrop.className = "modal-backdrop";
 
@@ -44,7 +53,7 @@ function Modal() {
     modalContent.className = "modal-content";
 
     // Append childs and insert content
-    modalContent.innerHTML = content;
+    modalContent.append(content);
     container.append(close, modalContent);
     backdrop.append(container);
     document.body.append(backdrop);
@@ -78,9 +87,13 @@ function Modal() {
 const modal = new Modal();
 
 $("#open-modal-1").onclick = (e) => {
-  modal.openModal("<h2>Modal 1</h2>");
+  modal.openModal({
+    templateId: "modal-1",
+  });
 };
 
 $("#open-modal-2").onclick = (e) => {
-  modal.openModal("<h2>Modal 2 - Heading of modal 3</h2>");
+  modal.openModal({
+    templateId: "modal-2",
+  });
 };
