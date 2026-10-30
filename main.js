@@ -2,8 +2,12 @@ const $ = document.querySelector.bind(document);
 const $$ = document.querySelectorAll.bind(document);
 
 function Modal(options = {}) {
-  const { templateId, closeMethods = ["button", "backdrop", "escape"] } =
-    options;
+  const {
+    templateId,
+    closeMethods = ["button", "backdrop", "escape"],
+    cssClass = [],
+    destroyOnClose = true,
+  } = options;
   const template = $(`#${templateId}`);
 
   if (!template) {
@@ -37,14 +41,20 @@ function Modal(options = {}) {
     return scrollbarWidth;
   }
 
-  this.open = () => {
+  this._build = () => {
     const content = template.content.cloneNode(true);
 
-    const backdrop = document.createElement("div");
-    backdrop.className = "modal-backdrop";
+    this._backdrop = document.createElement("div");
+    this._backdrop.className = "modal-backdrop";
 
     const container = document.createElement("div");
     container.className = "modal-container";
+
+    cssClass.forEach((className) => {
+      if (typeof className === "string") {
+        container.classList.add(className);
+      }
+    });
 
     if (this._allowButtonClose) {
       const closeBtn = document.createElement("button");
@@ -53,7 +63,7 @@ function Modal(options = {}) {
 
       container.append(closeBtn);
       closeBtn.onclick = () => {
-        this.close(backdrop);
+        this.close();
       };
     }
 
@@ -63,10 +73,16 @@ function Modal(options = {}) {
     // Append childs and insert content
     modalContent.append(content);
     container.append(modalContent);
-    backdrop.append(container);
-    document.body.append(backdrop);
+    this._backdrop.append(container);
+    document.body.append(this._backdrop);
+  };
 
-    setTimeout(() => backdrop.classList.add("show"), 0);
+  this.open = () => {
+    if (!this._backdrop) {
+      this._build();
+    }
+
+    setTimeout(() => this._backdrop.classList.add("show"), 0);
 
     // Disable scrolling
     document.body.classList.add("no-scroll");
@@ -74,9 +90,9 @@ function Modal(options = {}) {
 
     // Attach event listeners
     if (this._allowBackdropClose) {
-      backdrop.onclick = (e) => {
-        if (e.target === backdrop) {
-          this.close(backdrop);
+      this._backdrop.onclick = (e) => {
+        if (e.target === this._backdrop) {
+          this.close();
         }
       };
     }
@@ -84,23 +100,30 @@ function Modal(options = {}) {
     if (this._allowEscapeClose) {
       document.addEventListener("keydown", (e) => {
         if (e.key === "Escape") {
-          this.close(backdrop);
+          this.close();
         }
       });
     }
 
-    return backdrop;
+    return this._backdrop;
   };
 
-  this.close = (modalElement) => {
-    modalElement.classList.remove("show");
-    modalElement.ontransitionend = () => {
-      modalElement.remove();
+  this.close = (destroy = destroyOnClose) => {
+    this._backdrop.classList.remove("show");
+    this._backdrop.ontransitionend = () => {
+      if (destroy && this._backdrop) {
+        this._backdrop.remove();
+        this._backdrop = null;
+      }
     };
 
     // Enable scrolling
     document.body.classList.remove("no-scroll");
     document.body.style.paddingRight = "";
+  };
+
+  this.destroy = () => {
+    this.close(true);
   };
 }
 
@@ -108,6 +131,8 @@ function Modal(options = {}) {
 const modal1 = new Modal({
   templateId: "modal-1",
   closeMethods: ["button", "escape"],
+  cssClass: ["class-1", "class-2", "class-3"],
+  destroyOnClose: false,
 });
 
 $("#open-modal-1").onclick = (e) => {
