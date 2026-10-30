@@ -7,6 +7,8 @@ function Modal(options = {}) {
     closeMethods = ["button", "backdrop", "escape"],
     cssClass = [],
     destroyOnClose = true,
+    onOpen,
+    onClose,
   } = options;
   const template = $(`#${templateId}`);
 
@@ -105,21 +107,29 @@ function Modal(options = {}) {
       });
     }
 
+    this._backdrop.ontransitionend = (e) => {
+      if (e.propertyName !== "opacity") return;
+      if (typeof onClose === "function") onOpen();
+    };
+
     return this._backdrop;
   };
 
   this.close = (destroy = destroyOnClose) => {
     this._backdrop.classList.remove("show");
-    this._backdrop.ontransitionend = () => {
+    this._backdrop.ontransitionend = (e) => {
+      if (e.propertyName !== "opacity") return;
       if (destroy && this._backdrop) {
         this._backdrop.remove();
         this._backdrop = null;
       }
-    };
 
-    // Enable scrolling
-    document.body.classList.remove("no-scroll");
-    document.body.style.paddingRight = "";
+      // Enable scrolling
+      document.body.classList.remove("no-scroll");
+      document.body.style.paddingRight = "";
+
+      if (typeof onClose === "function") onClose();
+    };
   };
 
   this.destroy = () => {
@@ -133,6 +143,12 @@ const modal1 = new Modal({
   closeMethods: ["button", "escape"],
   cssClass: ["class-1", "class-2", "class-3"],
   destroyOnClose: false,
+  onOpen: () => {
+    console.log("Modal 1 onOpen ran!");
+  },
+  onClose: () => {
+    console.log("Modal 1 onClose ran!");
+  },
 });
 
 $("#open-modal-1").onclick = (e) => {
@@ -142,6 +158,12 @@ $("#open-modal-1").onclick = (e) => {
 // Modal 2
 const modal2 = new Modal({
   templateId: "modal-2",
+  onOpen: () => {
+    console.log("Modal 2 onOpen ran!");
+  },
+  onClose: () => {
+    console.log("Modal 2 onClose ran!");
+  },
 });
 
 $("#open-modal-2").onclick = (e) => {
