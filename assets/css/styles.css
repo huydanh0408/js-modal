@@ -117,10 +117,30 @@ p {
   color: #666;
 }
 
-/*Modal footer */
+/* Modal footer */
 .modal-footer {
+  display: flex;
+  column-gap: 16px;
   padding: 10px 0;
-  background-color: yellow;
+  justify-content: flex-end;
+}
+/* Modal footer buttons */
+.modal-btn {
+  padding: 8px 26px;
+  background: #ccc;
+  border-radius: 6px;
+}
+
+.modal-btn.primary {
+  background: #04ba4d;
+}
+
+.modal-btn.danger {
+  background: #fd4831;
+}
+
+.modal-btn.pull-left {
+  margin-right: auto;
 }
 
 /* Modal form */
