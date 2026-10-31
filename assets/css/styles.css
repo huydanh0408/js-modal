@@ -117,6 +117,12 @@ p {
   color: #666;
 }
 
+/*Modal footer */
+.modal-footer {
+  padding: 10px 0;
+  background-color: yellow;
+}
+
 /* Modal form */
 #form {
   display: flex;
