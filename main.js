@@ -1,6 +1,8 @@
 const $ = document.querySelector.bind(document);
 const $$ = document.querySelectorAll.bind(document);
 
+Modal.elements = [];
+
 function Modal(options = {}) {
   const {
     templateId,
@@ -123,6 +125,8 @@ function Modal(options = {}) {
   };
 
   this.open = () => {
+    Modal.elements.push(this);
+
     if (!this._backdrop) {
       this._build();
     }
@@ -143,12 +147,9 @@ function Modal(options = {}) {
     }
 
     if (this._allowEscapeClose) {
-      document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape") {
-          this.close();
-        }
-      });
+      document.addEventListener("keydown", this._handleEscapeKey);
     }
+
     this._onTransitionEnd(() => {
       if (typeof onOpen === "function") onOpen();
     });
@@ -156,8 +157,22 @@ function Modal(options = {}) {
     return this._backdrop;
   };
 
+  this._handleEscapeKey = (e) => {
+    const lastModal = Modal.elements[Modal.elements.length - 1];
+    if (e.key === "Escape" && lastModal === this) {
+      this.close();
+    }
+  };
+
   this.close = (destroy = destroyOnClose) => {
+    Modal.elements.pop(this);
+
     this._backdrop.classList.remove("show");
+
+    if (this._allowEscapeClose) {
+      document.removeEventListener("keydown", this._handleEscapeKey);
+    }
+
     this._onTransitionEnd(() => {
       if (destroy && this._backdrop) {
         this._backdrop.remove();
@@ -166,8 +181,10 @@ function Modal(options = {}) {
       }
 
       // Enable scrolling
-      document.body.classList.remove("no-scroll");
-      document.body.style.paddingRight = "";
+      if (!Modal.elements.length) {
+        document.body.classList.remove("no-scroll");
+        document.body.style.paddingRight = "";
+      }
 
       if (typeof onClose === "function") onClose();
     });
@@ -251,4 +268,6 @@ modal3.addFooterButton("<span>Agree</span>", "modal-btn primary", (e) => {
   modal3.close();
 });
 
-modal3.open();
+$("#open-modal-3").onclick = () => {
+  modal3.open();
+};
