@@ -59,7 +59,7 @@ p {
 }
 
 /* Modal */
-.modal-backdrop {
+.popzy__backdrop {
   position: fixed;
   inset: 0;
   display: flex;
@@ -72,16 +72,16 @@ p {
   transition-duration: 0.3s;
 }
 
-.modal-backdrop.show {
+.popzy--show {
   visibility: visible;
   opacity: 1;
 }
 
-.modal-backdrop.show .modal-container {
+.popzy--show .popzy__container {
   scale: 1;
 }
 
-.modal-container {
+.popzy__container {
   position: relative;
   width: min(600px, 90%);
   background: #fff;
@@ -91,7 +91,7 @@ p {
   transition: scale 0.3s;
 }
 
-.modal-close {
+.popzy__close {
   position: absolute;
   top: 6px;
   right: 6px;
@@ -103,12 +103,12 @@ p {
   text-align: center;
 }
 
-.modal-content {
+.popzy__content {
   max-height: 80vh;
   overflow: auto;
 }
 
-.no-scroll {
+.popzy--no-scroll {
   overflow: hidden;
 }
 
@@ -118,28 +118,28 @@ p {
 }
 
 /* Modal Footer */
-.modal-footer {
+.popzy__footer {
   display: flex;
   justify-content: flex-end;
   column-gap: 10px;
   padding: 10px 0;
 }
 
-.modal-btn {
+.popzy__btn {
   padding: 8px 16px;
   background: #b7b7b7;
   border-radius: 6px;
 }
 
-.modal-btn.primary {
+.popzy__btn--primary {
   background: #23b969;
 }
 
-.modal-btn.danger {
+.popzy__btn--danger {
   background: #de2727;
 }
 
-.modal-btn.pull-left {
+.popzy__btn--pull-left {
   margin-right: auto;
 }
 
