@@ -70,6 +70,8 @@ function Popzy(options = {}) {
 }
 
 function _getScrollbarWidth() {
+  if (_getScrollbarWidth.value !== undefined) return _getScrollbarWidth.value;
+
   const div = document.createElement("div");
   Object.assign(div.style, {
     position: "absolute",
@@ -77,15 +79,17 @@ function _getScrollbarWidth() {
     overflow: "scroll",
   });
   document.body.appendChild(div);
-  const scrollbarWidth = div.offsetWidth - div.clientWidth;
+  _getScrollbarWidth.value = div.offsetWidth - div.clientWidth;
   document.body.removeChild(div);
-  return scrollbarWidth;
+  return _getScrollbarWidth.value;
 }
 
+// Modal 1
 const modal1 = new Popzy({ templateId: "modal-1" });
 
 $("#open-modal-1").onclick = () => modal1.open();
 
+// Modal 2
 const modal2 = new Popzy({ templateId: "modal-2" });
 
 $("#open-modal-2").onclick = () => {
