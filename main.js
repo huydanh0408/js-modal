@@ -30,15 +30,14 @@ function Popzy(options = {}) {
 
     setTimeout(() => this.backdrop.classList.add("popzy--show"), 0);
 
-    closetBtn.onclick = () => {
-      this.close();
-      return;
-    };
+    // Disable scrolling
+    document.body.classList.add("popzy--no-scroll");
+
+    closetBtn.onclick = () => this.close();
 
     this.backdrop.onclick = (e) => {
-      if (e.target === "Escape") {
+      if (e.target === this.backdrop) {
         this.close();
-        return;
       }
     };
 
@@ -47,6 +46,7 @@ function Popzy(options = {}) {
         this.close();
       }
     };
+    return this.backdrop;
   };
 
   this.close = () => {
@@ -55,9 +55,29 @@ function Popzy(options = {}) {
       if (e.propertyName !== "opacity") return;
       document.body.removeChild(this.backdrop);
     };
+
+    // Enable scrolling
+    document.body.classList.remove("popzy--no-scroll");
   };
 }
 
 const modal1 = new Popzy({ templateId: "modal-1" });
 
 $("#open-modal-1").onclick = () => modal1.open();
+
+const modal2 = new Popzy({ templateId: "modal-2" });
+
+$("#open-modal-2").onclick = () => {
+  const modalReturned = modal2.open();
+  const form = modalReturned.querySelector(".form");
+  if (form) {
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const formData = {
+        mail: form.querySelector("#email-modal-2").value.trim(),
+        password: form.querySelector("#password-modal-2").value.trim(),
+      };
+      console.log(formData);
+    });
+  }
+};

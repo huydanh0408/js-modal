@@ -104,3 +104,29 @@ p {
   max-height: 80vh;
   overflow: auto;
 }
+
+.popzy--no-scroll {
+  overflow: hidden;
+}
+/* Form */
+.form {
+  margin-top: 20px;
+}
+
+.form-group {
+  display: flex;
+  max-width: 300px;
+  margin-top: 8px;
+}
+
+.form-label {
+  width: 30%;
+}
+
+.form-input {
+  flex: 1;
+}
+
+.form-submit {
+  margin-top: 20px;
+}
