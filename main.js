@@ -8,6 +8,11 @@ function Popzy(options = {}) {
   this.open = () => {
     if (!template) return console.error(`#${templateId} doesn't exist!`);
 
+    this._targetPadRight =
+      Number.parseInt(
+        window.getComputedStyle(document.body)["padding-right"],
+      ) || 0;
+
     // Create modal elements
     this.backdrop = document.createElement("div");
     this.backdrop.className = "popzy";
@@ -32,6 +37,8 @@ function Popzy(options = {}) {
 
     // Disable scrolling
     document.body.classList.add("popzy--no-scroll");
+    document.body.style.paddingRight =
+      this._targetPadRight + _getScrollbarWidth() + "px";
 
     closetBtn.onclick = () => this.close();
 
@@ -58,7 +65,21 @@ function Popzy(options = {}) {
 
     // Enable scrolling
     document.body.classList.remove("popzy--no-scroll");
+    document.body.style.paddingRight = this._targetPadRight + "px";
   };
+}
+
+function _getScrollbarWidth() {
+  const div = document.createElement("div");
+  Object.assign(div.style, {
+    position: "absolute",
+    top: "-30px",
+    overflow: "scroll",
+  });
+  document.body.appendChild(div);
+  const scrollbarWidth = div.offsetWidth - div.clientWidth;
+  document.body.removeChild(div);
+  return scrollbarWidth;
 }
 
 const modal1 = new Popzy({ templateId: "modal-1" });
