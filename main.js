@@ -1,26 +1,63 @@
-/**
- * <div class="modal-backdrop">
-      <div class="modal-container">
-        <div class="modal-close">&times;</div>
-        <div class="modal-content">
-          <h2>
-            Modal 1 - The Quiet Life Is the Most Underrated Path to Success
-          </h2>
-          <p>
-            I live a boring life. I’m 39, and most of my days look exactly the
-            same.
-          </p>
-          <p>
-            I work from a small office, take walks, see my family, lift weights,
-            read, and write. That’s about it.
-          </p>
-          <p>And I love it.</p>
-          <p>
-            My 19-year-old self would scoff at this. Even my 29-year-old self
-            would. “Is that all there is to life?” he’d say. “You’ve got to be
-            out there. In the middle of the action!”
-          </p>
-        </div>
-      </div>
-    </div>
- */
+const $ = document.querySelector.bind(document);
+const $$ = document.querySelectorAll.bind(document);
+
+function Popzy(options = {}) {
+  const { templateId } = options;
+  const template = $(`#${templateId}`);
+
+  this.open = () => {
+    if (!template) return console.error(`#${templateId} doesn't exist!`);
+
+    // Create modal elements
+    this.backdrop = document.createElement("div");
+    this.backdrop.className = "popzy";
+
+    const container = document.createElement("div");
+    container.className = "popzy__container";
+
+    const closetBtn = document.createElement("button");
+    closetBtn.className = "popzy__close";
+    closetBtn.innerHTML = "&times;";
+
+    const content = document.createElement("div");
+    content.className = "popzy__content";
+    content.append(template.content.cloneNode(true));
+
+    // Append content and element
+    container.append(closetBtn, content);
+    this.backdrop.append(container);
+    document.body.appendChild(this.backdrop);
+
+    setTimeout(() => this.backdrop.classList.add("popzy--show"), 0);
+
+    closetBtn.onclick = () => {
+      this.close();
+      return;
+    };
+
+    this.backdrop.onclick = (e) => {
+      if (e.target === "Escape") {
+        this.close();
+        return;
+      }
+    };
+
+    document.onkeydown = (e) => {
+      if (e.key === "Escape") {
+        this.close();
+      }
+    };
+  };
+
+  this.close = () => {
+    this.backdrop.classList.remove("popzy--show");
+    this.backdrop.ontransitionend = (e) => {
+      if (e.propertyName !== "opacity") return;
+      document.body.removeChild(this.backdrop);
+    };
+  };
+}
+
+const modal1 = new Popzy({ templateId: "modal-1" });
+
+$("#open-modal-1").onclick = () => modal1.open();

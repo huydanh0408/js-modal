@@ -31,9 +31,12 @@ body {
 }
 
 .buttons {
+  position: sticky;
+  top: 0;
   display: flex;
   column-gap: 20px;
-  padding: 20px 0px;
+  padding: 16px 0px;
+  background: #fff;
   border-bottom: 1px solid #ccc;
 }
 
@@ -53,7 +56,7 @@ p {
 }
 
 /* Modal */
-.modal-backdrop {
+.popzy {
   position: fixed;
   inset: 0;
   display: flex;
@@ -66,16 +69,16 @@ p {
   transition-duration: 0.3s;
 }
 
-.modal-backdrop.show {
+.popzy--show {
   visibility: visible;
   opacity: 1;
 }
 
-.modal-backdrop.show .modal-container {
+.popzy--show .popzy__container {
   scale: 1;
 }
 
-.modal-container {
+.popzy__container {
   position: relative;
   width: min(600px, 90%);
   background: #fff;
@@ -85,7 +88,7 @@ p {
   transition: scale 0.3s;
 }
 
-.modal-close {
+.popzy__close {
   position: absolute;
   top: 6px;
   right: 6px;
@@ -97,7 +100,7 @@ p {
   text-align: center;
 }
 
-.modal-content {
+.popzy__content {
   max-height: 80vh;
   overflow: auto;
 }
