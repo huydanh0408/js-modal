@@ -2,8 +2,12 @@ const $ = document.querySelector.bind(document);
 const $$ = document.querySelectorAll.bind(document);
 
 function Popzy(options = {}) {
-  const { templateId, closeMethods = ["button", "backdrop", "escape"] } =
-    options;
+  const {
+    templateId,
+    closeMethods = ["button", "backdrop", "escape"],
+    cssClass = [],
+    destroyOnClose = true,
+  } = options;
   const template = $(`#${templateId}`);
 
   this._allowButtonClose = closeMethods.includes("button");
@@ -18,12 +22,66 @@ function Popzy(options = {}) {
         window.getComputedStyle(document.body)["padding-right"],
       ) || 0;
 
+    if (!this._backdrop) this._build();
+
+    setTimeout(() => this._backdrop.classList.add("popzy--show"), 0);
+
+    // Disable scrolling
+    document.body.classList.add("popzy--no-scroll");
+    document.body.style.paddingRight =
+      this._targetPadRight + _getScrollbarWidth() + "px";
+
+    if (this._allowBackdropClose) {
+      this._backdrop.onclick = (e) => {
+        if (e.target === this._backdrop) {
+          this.close();
+        }
+      };
+    }
+
+    if (this._allowEscapeClose) {
+      document.addEventListener("keydown", this._handleEscapeKey);
+    }
+    return this._backdrop;
+  };
+
+  this.close = (destroy = destroyOnClose) => {
+    if (this._allowEscapeClose) {
+      document.removeEventListener("keydown", this._handleEscapeKey);
+    }
+
+    this._backdrop.classList.remove("popzy--show");
+    this._backdrop.ontransitionend = (e) => {
+      if (e.propertyName !== "opacity") return;
+
+      e.currentTarget.ontransitionend = null;
+
+      if (destroy) {
+        this._backdrop.remove();
+        this._backdrop = null;
+      }
+
+      // Enable scrolling
+      document.body.classList.remove("popzy--no-scroll");
+      document.body.style.paddingRight = this._targetPadRight + "px";
+    };
+  };
+
+  this.destroy = () => {
+    this.close(true);
+  };
+
+  this._build = () => {
     // Create modal elements
-    this.backdrop = document.createElement("div");
-    this.backdrop.className = "popzy";
+    this._backdrop = document.createElement("div");
+    this._backdrop.className = "popzy";
 
     const container = document.createElement("div");
     container.className = "popzy__container";
+
+    cssClass.forEach((className) => {
+      if (typeof className === "string") container.classList.add(className);
+    });
 
     if (this._allowButtonClose) {
       const closetBtn = document.createElement("button");
@@ -40,44 +98,8 @@ function Popzy(options = {}) {
 
     // Append content and element
     container.append(content);
-    this.backdrop.append(container);
-    document.body.appendChild(this.backdrop);
-
-    setTimeout(() => this.backdrop.classList.add("popzy--show"), 0);
-
-    // Disable scrolling
-    document.body.classList.add("popzy--no-scroll");
-    document.body.style.paddingRight =
-      this._targetPadRight + _getScrollbarWidth() + "px";
-
-    if (this._allowBackdropClose) {
-      this.backdrop.onclick = (e) => {
-        if (e.target === this.backdrop) {
-          this.close();
-        }
-      };
-    }
-
-    if (this._allowEscapeClose) {
-      document.addEventListener("keydown", this._handleEscapeKey);
-    }
-    return this.backdrop;
-  };
-
-  this.close = () => {
-    if (this._allowEscapeClose) {
-      document.removeEventListener("keydown", this._handleEscapeKey);
-    }
-
-    this.backdrop.classList.remove("popzy--show");
-    this.backdrop.ontransitionend = (e) => {
-      if (e.propertyName !== "opacity") return;
-      document.body.removeChild(this.backdrop);
-    };
-
-    // Enable scrolling
-    document.body.classList.remove("popzy--no-scroll");
-    document.body.style.paddingRight = this._targetPadRight + "px";
+    this._backdrop.append(container);
+    document.body.appendChild(this._backdrop);
   };
 
   this._handleEscapeKey = (e) => {
@@ -106,6 +128,8 @@ function _getScrollbarWidth() {
 const modal1 = new Popzy({
   templateId: "modal-1",
   closeMethods: ["button", "escape"],
+  cssClass: ["class-1", "class-2", "class-3"],
+  destroyOnClose: false,
 });
 
 $("#open-modal-1").onclick = () => modal1.open();
