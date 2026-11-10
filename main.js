@@ -2,8 +2,13 @@ const $ = document.querySelector.bind(document);
 const $$ = document.querySelectorAll.bind(document);
 
 function Popzy(options = {}) {
-  const { templateId } = options;
+  const { templateId, closeMethods = ["button", "backdrop", "escape"] } =
+    options;
   const template = $(`#${templateId}`);
+
+  this._allowButtonClose = closeMethods.includes("button");
+  this._allowBackdropClose = closeMethods.includes("backdrop");
+  this._allowEscapeClose = closeMethods.includes("escape");
 
   this.open = () => {
     if (!template) return console.error(`#${templateId} doesn't exist!`);
@@ -20,16 +25,21 @@ function Popzy(options = {}) {
     const container = document.createElement("div");
     container.className = "popzy__container";
 
-    const closetBtn = document.createElement("button");
-    closetBtn.className = "popzy__close";
-    closetBtn.innerHTML = "&times;";
+    if (this._allowButtonClose) {
+      const closetBtn = document.createElement("button");
+      closetBtn.className = "popzy__close";
+      closetBtn.innerHTML = "&times;";
+      container.append(closetBtn);
+
+      closetBtn.onclick = () => this.close();
+    }
 
     const content = document.createElement("div");
     content.className = "popzy__content";
     content.append(template.content.cloneNode(true));
 
     // Append content and element
-    container.append(closetBtn, content);
+    container.append(content);
     this.backdrop.append(container);
     document.body.appendChild(this.backdrop);
 
@@ -40,23 +50,25 @@ function Popzy(options = {}) {
     document.body.style.paddingRight =
       this._targetPadRight + _getScrollbarWidth() + "px";
 
-    closetBtn.onclick = () => this.close();
+    if (this._allowBackdropClose) {
+      this.backdrop.onclick = (e) => {
+        if (e.target === this.backdrop) {
+          this.close();
+        }
+      };
+    }
 
-    this.backdrop.onclick = (e) => {
-      if (e.target === this.backdrop) {
-        this.close();
-      }
-    };
-
-    document.onkeydown = (e) => {
-      if (e.key === "Escape") {
-        this.close();
-      }
-    };
+    if (this._allowEscapeClose) {
+      document.addEventListener("keydown", this._handleEscapeKey);
+    }
     return this.backdrop;
   };
 
   this.close = () => {
+    if (this._allowEscapeClose) {
+      document.removeEventListener("keydown", this._handleEscapeKey);
+    }
+
     this.backdrop.classList.remove("popzy--show");
     this.backdrop.ontransitionend = (e) => {
       if (e.propertyName !== "opacity") return;
@@ -66,6 +78,12 @@ function Popzy(options = {}) {
     // Enable scrolling
     document.body.classList.remove("popzy--no-scroll");
     document.body.style.paddingRight = this._targetPadRight + "px";
+  };
+
+  this._handleEscapeKey = (e) => {
+    if (e.key === "Escape") {
+      this.close();
+    }
   };
 }
 
@@ -85,12 +103,18 @@ function _getScrollbarWidth() {
 }
 
 // Modal 1
-const modal1 = new Popzy({ templateId: "modal-1" });
+const modal1 = new Popzy({
+  templateId: "modal-1",
+  closeMethods: ["button", "escape"],
+});
 
 $("#open-modal-1").onclick = () => modal1.open();
 
 // Modal 2
-const modal2 = new Popzy({ templateId: "modal-2" });
+const modal2 = new Popzy({
+  templateId: "modal-2",
+  closeMethods: ["backdrop"],
+});
 
 $("#open-modal-2").onclick = () => {
   const modalReturned = modal2.open();
