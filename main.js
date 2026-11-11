@@ -1,6 +1,8 @@
 const $ = document.querySelector.bind(document);
 const $$ = document.querySelectorAll.bind(document);
 
+Popzy.elements = [];
+
 function Popzy(options = {}) {
   const {
     templateId,
@@ -22,10 +24,7 @@ function Popzy(options = {}) {
   this.open = () => {
     if (!template) return console.error(`#${templateId} doesn't exist!`);
 
-    this._targetPadRight =
-      Number.parseInt(
-        window.getComputedStyle(document.body)["padding-right"],
-      ) || 0;
+    Popzy.elements.push(this);
 
     if (!this._backdrop) this._build();
 
@@ -35,9 +34,16 @@ function Popzy(options = {}) {
     }, 0);
 
     // Disable scrolling
-    document.body.classList.add("popzy--no-scroll");
-    document.body.style.paddingRight =
-      this._targetPadRight + _getScrollbarWidth() + "px";
+    if (Popzy.elements.length === 1) {
+      Popzy._originalPadRight =
+        Number.parseInt(
+          window.getComputedStyle(document.body)["padding-right"],
+        ) || 0;
+
+      document.body.classList.add("popzy--no-scroll");
+      document.body.style.paddingRight =
+        Popzy._originalPadRight + _getScrollbarWidth() + "px";
+    }
 
     if (this._allowBackdropClose) {
       this._backdrop.onclick = (e) => {
@@ -54,6 +60,8 @@ function Popzy(options = {}) {
   };
 
   this.close = (destroy = destroyOnClose) => {
+    Popzy.elements.pop();
+
     if (this._allowEscapeClose) {
       document.removeEventListener("keydown", this._handleEscapeKey);
     }
@@ -67,8 +75,10 @@ function Popzy(options = {}) {
       }
 
       // Enable scrolling
-      document.body.classList.remove("popzy--no-scroll");
-      document.body.style.paddingRight = this._targetPadRight + "px";
+      if (!Popzy.elements.length) {
+        document.body.classList.remove("popzy--no-scroll");
+        document.body.style.paddingRight = `${Popzy._originalPadRight}px`;
+      }
 
       if (typeof onClose === "function") onClose();
     });
@@ -139,7 +149,8 @@ function Popzy(options = {}) {
   };
 
   this._handleEscapeKey = (e) => {
-    if (e.key === "Escape") {
+    const lastModal = Popzy.elements[Popzy.elements.length - 1];
+    if (e.key === "Escape" && lastModal === this) {
       this.close();
     }
   };
@@ -190,7 +201,7 @@ $("#open-modal-1").onclick = () => modal1.open();
 // Modal 2
 const modal2 = new Popzy({
   templateId: "modal-2",
-  closeMethods: ["backdrop"],
+  closeMethods: ["backdrop", "escape"],
   onOpen: () => {
     console.log("Modal2 - onOpen ran!!!");
   },
@@ -217,7 +228,7 @@ $("#open-modal-2").onclick = () => {
 // Modal 3
 const modal3 = new Popzy({
   templateId: "modal-3",
-  closeMethods: [],
+  closeMethods: ["escape"],
   footer: true,
 });
 
