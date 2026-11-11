@@ -110,10 +110,32 @@ p {
 }
 
 .popzy__footer {
+  display: flex;
+  justify-content: flex-end;
+  column-gap: 16px;
   margin-top: 20px;
   padding: 10px 0px;
   background: yellow;
 }
+
+.popzy__btn {
+  padding: 10px 20px;
+  background: #ccc;
+  border-radius: 6px;
+}
+
+.popzy__btn--primary {
+  background: #16f225;
+}
+
+.popzy__btn--danger {
+  background: #ff2929;
+}
+
+.popzy__btn--pull-left {
+  margin-right: auto;
+}
+
 /* Form */
 .form {
   margin-top: 20px;

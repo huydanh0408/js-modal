@@ -17,6 +17,8 @@ function Popzy(options = {}) {
   this._allowBackdropClose = closeMethods.includes("backdrop");
   this._allowEscapeClose = closeMethods.includes("escape");
 
+  this._footerButtons = [];
+
   this.open = () => {
     if (!template) return console.error(`#${templateId} doesn't exist!`);
 
@@ -83,6 +85,15 @@ function Popzy(options = {}) {
     }
   };
 
+  this.addFooterButton = (title, cssClass, callback) => {
+    const button = document.createElement("button");
+    button.innerHTML = title;
+    button.className = cssClass;
+    button.onclick = callback;
+
+    this._footerButtons.push(button);
+  };
+
   this._build = () => {
     // Create modal elements
     this._backdrop = document.createElement("div");
@@ -117,6 +128,9 @@ function Popzy(options = {}) {
       if (this._footerContent) {
         this._modalFooter.innerHTML = this._footerContent;
       }
+      this._footerButtons.forEach((btn) => {
+        this._modalFooter.append(btn);
+      });
       container.append(this._modalFooter);
     }
 
@@ -199,3 +213,32 @@ $("#open-modal-2").onclick = () => {
     });
   }
 };
+
+// Modal 3
+const modal3 = new Popzy({
+  templateId: "modal-3",
+  closeMethods: [],
+  footer: true,
+});
+
+$("#open-modal-3").onclick = () => {
+  modal3.open();
+};
+
+modal3.addFooterButton(
+  "<span>Danger</span>",
+  "popzy__btn popzy__btn--danger popzy__btn--pull-left",
+  () => {
+    // logics
+    modal3.close();
+  },
+);
+
+modal3.addFooterButton("Close", "popzy__btn", () => {
+  modal3.close();
+});
+
+modal3.addFooterButton("Accept", "popzy__btn popzy__btn--primary", () => {
+  // logics
+  modal3.close();
+});
