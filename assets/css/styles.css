@@ -114,8 +114,6 @@ p {
   justify-content: flex-end;
   column-gap: 16px;
   margin-top: 20px;
-  padding: 10px 0px;
-  background: yellow;
 }
 
 .popzy__btn {

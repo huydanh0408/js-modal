@@ -90,18 +90,13 @@ function Popzy(options = {}) {
 
   this.setFooterContent = (content) => {
     this._footerContent = content;
-    if (this._modalFooter) {
-      this._modalFooter.innerHTML = this._footerContent;
-    }
+    this._renderFooterContent();
   };
 
   this.addFooterButton = (title, cssClass, callback) => {
-    const button = document.createElement("button");
-    button.innerHTML = title;
-    button.className = cssClass;
-    button.onclick = callback;
-
+    const button = this._createButton(title, cssClass, callback);
     this._footerButtons.push(button);
+    this._renderFooterButtons();
   };
 
   this._build = () => {
@@ -117,12 +112,10 @@ function Popzy(options = {}) {
     });
 
     if (this._allowButtonClose) {
-      const closetBtn = document.createElement("button");
-      closetBtn.className = "popzy__close";
-      closetBtn.innerHTML = "&times;";
+      const closetBtn = this._createButton("&times;", "popzy__close", () =>
+        this.close(),
+      );
       container.append(closetBtn);
-
-      closetBtn.onclick = () => this.close();
     }
 
     const content = document.createElement("div");
@@ -135,17 +128,27 @@ function Popzy(options = {}) {
     if (footer) {
       this._modalFooter = document.createElement("div");
       this._modalFooter.className = "popzy__footer";
-      if (this._footerContent) {
-        this._modalFooter.innerHTML = this._footerContent;
-      }
-      this._footerButtons.forEach((btn) => {
-        this._modalFooter.append(btn);
-      });
+      this._renderFooterContent();
+      this._renderFooterButtons();
       container.append(this._modalFooter);
     }
 
     this._backdrop.append(container);
     document.body.appendChild(this._backdrop);
+  };
+
+  this._renderFooterContent = () => {
+    if (this._footerContent && this._modalFooter) {
+      this._modalFooter.innerHTML = this._footerContent;
+    }
+  };
+
+  this._renderFooterButtons = () => {
+    if (this._modalFooter) {
+      this._footerButtons.forEach((btn) => {
+        this._modalFooter.append(btn);
+      });
+    }
   };
 
   this._handleEscapeKey = (e) => {
@@ -163,6 +166,15 @@ function Popzy(options = {}) {
 
       if (typeof callback === "function") callback();
     };
+  };
+
+  this._createButton = (title, cssClass, callback) => {
+    const button = document.createElement("button");
+    button.innerHTML = title;
+    button.className = cssClass;
+    button.onclick = callback;
+
+    return button;
   };
 }
 
