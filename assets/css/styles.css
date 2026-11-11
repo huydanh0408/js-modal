@@ -108,6 +108,12 @@ p {
 .popzy--no-scroll {
   overflow: hidden;
 }
+
+.popzy__footer {
+  margin-top: 20px;
+  padding: 10px 0px;
+  background: yellow;
+}
 /* Form */
 .form {
   margin-top: 20px;

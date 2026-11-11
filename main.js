@@ -7,6 +7,9 @@ function Popzy(options = {}) {
     closeMethods = ["button", "backdrop", "escape"],
     cssClass = [],
     destroyOnClose = true,
+    footer = false,
+    onOpen,
+    onClose,
   } = options;
   const template = $(`#${templateId}`);
 
@@ -24,7 +27,10 @@ function Popzy(options = {}) {
 
     if (!this._backdrop) this._build();
 
-    setTimeout(() => this._backdrop.classList.add("popzy--show"), 0);
+    setTimeout(() => {
+      this._backdrop.classList.add("popzy--show");
+      this._onTransitionEnd(onOpen);
+    }, 0);
 
     // Disable scrolling
     document.body.classList.add("popzy--no-scroll");
@@ -51,24 +57,30 @@ function Popzy(options = {}) {
     }
 
     this._backdrop.classList.remove("popzy--show");
-    this._backdrop.ontransitionend = (e) => {
-      if (e.propertyName !== "opacity") return;
-
-      e.currentTarget.ontransitionend = null;
-
+    this._onTransitionEnd(() => {
       if (destroy) {
         this._backdrop.remove();
         this._backdrop = null;
+        this._modalFooter = null;
       }
 
       // Enable scrolling
       document.body.classList.remove("popzy--no-scroll");
       document.body.style.paddingRight = this._targetPadRight + "px";
-    };
+
+      if (typeof onClose === "function") onClose();
+    });
   };
 
   this.destroy = () => {
     this.close(true);
+  };
+
+  this.setFooterContent = (content) => {
+    this._footerContent = content;
+    if (this._modalFooter) {
+      this._modalFooter.innerHTML = this._footerContent;
+    }
   };
 
   this._build = () => {
@@ -98,6 +110,16 @@ function Popzy(options = {}) {
 
     // Append content and element
     container.append(content);
+
+    if (footer) {
+      this._modalFooter = document.createElement("div");
+      this._modalFooter.className = "popzy__footer";
+      if (this._footerContent) {
+        this._modalFooter.innerHTML = this._footerContent;
+      }
+      container.append(this._modalFooter);
+    }
+
     this._backdrop.append(container);
     document.body.appendChild(this._backdrop);
   };
@@ -106,6 +128,16 @@ function Popzy(options = {}) {
     if (e.key === "Escape") {
       this.close();
     }
+  };
+
+  this._onTransitionEnd = (callback) => {
+    this._backdrop.ontransitionend = (e) => {
+      if (e.propertyName !== "opacity") return;
+
+      e.currentTarget.ontransitionend = null;
+
+      if (typeof callback === "function") callback();
+    };
   };
 }
 
@@ -130,6 +162,13 @@ const modal1 = new Popzy({
   closeMethods: ["button", "escape"],
   cssClass: ["class-1", "class-2", "class-3"],
   destroyOnClose: false,
+  footer: true,
+  onOpen: () => {
+    console.log("Modal1 - onOpen ran!!!");
+  },
+  onClose: () => {
+    console.log("Modal1 - onClose ran!!!");
+  },
 });
 
 $("#open-modal-1").onclick = () => modal1.open();
@@ -138,6 +177,12 @@ $("#open-modal-1").onclick = () => modal1.open();
 const modal2 = new Popzy({
   templateId: "modal-2",
   closeMethods: ["backdrop"],
+  onOpen: () => {
+    console.log("Modal2 - onOpen ran!!!");
+  },
+  onClose: () => {
+    console.log("Modal2 - onClose ran!!!");
+  },
 });
 
 $("#open-modal-2").onclick = () => {
